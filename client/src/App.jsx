@@ -173,8 +173,8 @@ function App() {
   // ── Auth ──────────────────────────────────────────────────────────────────
 
   const signIn = async mode => {
-    if (mode === 'register' && !form.name.trim()) {
-      toast('Please enter your full name to register', 'error');
+    if (mode === 'register' && (!form.name.trim() || !form.email.trim() || !form.password.trim())) {
+      toast('Please fill in Full Name, Email, and Password to register', 'error');
       return;
     }
     try {
@@ -487,11 +487,16 @@ function App() {
         <div className="grid-2" style={{ marginTop: '1rem' }}>
           <button id="btn-login" onClick={() => signIn('login')}>Sign In</button>
         </div>
+        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+          Already have an account? Enter your email and password above, then click Sign In.
+        </p>
 
         <details style={{ marginTop: '1.25rem' }} open>
-          <summary style={{ cursor: 'pointer', fontSize: '0.85rem', color: 'var(--text-muted)' }}>Register new account</summary>
+          <summary style={{ cursor: 'pointer', fontSize: '0.85rem', color: 'var(--text-muted)' }}>New here? Register an account</summary>
           <div style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <input placeholder="Full Name" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+            <input placeholder="Email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} />
+            <input type="password" placeholder="Password" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} />
             <input placeholder="Phone" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} />
             <select value={form.role} onChange={e => setForm({ ...form, role: e.target.value })}>
               <option value="customer">Customer</option>
