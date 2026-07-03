@@ -173,6 +173,10 @@ function App() {
   // ── Auth ──────────────────────────────────────────────────────────────────
 
   const signIn = async mode => {
+    if (mode === 'register' && !form.name.trim()) {
+      toast('Please enter your full name to register', 'error');
+      return;
+    }
     try {
       const resp = mode === 'login'
         ? await api.login({ email: form.email, password: form.password })
@@ -482,10 +486,9 @@ function App() {
 
         <div className="grid-2" style={{ marginTop: '1rem' }}>
           <button id="btn-login" onClick={() => signIn('login')}>Sign In</button>
-          <button id="btn-register" className="secondary" onClick={() => signIn('register')}>Register</button>
         </div>
 
-        <details style={{ marginTop: '1.25rem' }}>
+        <details style={{ marginTop: '1.25rem' }} open>
           <summary style={{ cursor: 'pointer', fontSize: '0.85rem', color: 'var(--text-muted)' }}>Register new account</summary>
           <div style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <input placeholder="Full Name" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
@@ -494,6 +497,7 @@ function App() {
               <option value="customer">Customer</option>
               <option value="agent">Delivery Agent</option>
             </select>
+            <button id="btn-register" className="secondary" onClick={() => signIn('register')}>Register</button>
           </div>
         </details>
       </div>
