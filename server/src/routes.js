@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const { db } = require('./db');
 const { auth } = require('./middleware');
 const { calculateCharge } = require('./rateEngine');
-const { sendStatusEmail } = require('./notifications');
+const { notifyCustomer } = require('./notifications');
 
 const router = express.Router();
 
@@ -382,8 +382,9 @@ router.post('/orders', auth(), async (req, res) => {
 
     if (agent) await setAgentStatus(agent.id, 'busy');
 
-    await sendStatusEmail({
-      to: customerRow.email,
+    await notifyCustomer({
+      email: customerRow.email,
+      phone: customerRow.phone,
       subject: `Order #${orderId} Created`,
       message: `Your order #${orderId} has been created with status "${initialStatus}". Estimated charge: ₹${calc.charge}.`
     });
@@ -501,8 +502,9 @@ router.patch('/orders/:id/status', auth(['admin', 'agent']), async (req, res) =>
 
   const customer = await getRow('SELECT * FROM users WHERE id = ?', [order.customer_id]);
   if (customer) {
-    await sendStatusEmail({
-      to: customer.email,
+    await notifyCustomer({
+      email: customer.email,
+      phone: customer.phone,
       subject: `Order #${orderId} — ${status}`,
       message: `Your order #${orderId} status has been updated to "${status}".${notes ? ` Note: ${notes}` : ''}`
     });
@@ -560,8 +562,9 @@ router.post('/orders/:id/reschedule', auth('customer'), async (req, res) => {
 
   const customer = await getRow('SELECT * FROM users WHERE id = ?', [req.user.id]);
   if (customer) {
-    await sendStatusEmail({
-      to: customer.email,
+    await notifyCustomer({
+      email: customer.email,
+      phone: customer.phone,
       subject: `Order #${orderId} Rescheduled`,
       message: `Your order #${orderId} has been rescheduled for ${rescheduleDate}. Status: ${newStatus}.`
     });
